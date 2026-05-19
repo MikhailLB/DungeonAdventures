@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../app.dart';
+import '../gray/config/gateway_endpoints.dart';
 import 'game_assets.dart';
 import 'game_engine.dart';
 import 'game_painter.dart';
@@ -260,6 +262,43 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
                 _Hint(icon: Icons.swipe, text: 'Swipe controls only'),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () => launchUrl(
+                    Uri.parse(GatewayEndpoints.privacyUrl),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  child: Text(
+                    'Privacy Policy',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      fontSize: 11,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white.withValues(alpha: 0.2),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () => launchUrl(
+                    Uri.parse(GatewayEndpoints.supportUrl),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  child: Text(
+                    'Support',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      fontSize: 11,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white.withValues(alpha: 0.2),
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
