@@ -215,7 +215,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             ),
             const Spacer(),
             Image.asset(
-              'assets/game_name.webp',
+              'assets/title.webp',
               width: 330,
               fit: BoxFit.contain,
             ),
@@ -234,7 +234,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   ],
                 ),
                 child: Image.asset(
-                  'assets/assets/turkey_asset.webp',
+                  'assets/assets/player.webp',
                   width: 130,
                   height: 130,
                   fit: BoxFit.contain,
@@ -587,7 +587,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/assets/turkey_death_asset.webp', width: 120, height: 120),
+                  Image.asset('assets/assets/player_dead.webp', width: 120, height: 120),
                   const SizedBox(height: 6),
                   const Text(
                     'RUN OVER',

@@ -43,26 +43,26 @@ class GameAssets {
     }
 
     final results = await Future.wait<ui.Image>([
-      _load('assets/game_name.webp'), // 0
+      _load('assets/title.webp'), // 0
       _load('assets/assets/logo.webp'), // 1
-      _load('assets/assets/turkey_asset.webp'), // 2
-      _load('assets/assets/turkey_death_asset.webp'), // 3
-      _load('assets/assets/turkey_fired_asset.webp'), // 4
-      _load('assets/assets/trolley_1_asset.webp'), // 5
-      _load('assets/assets/trolley_2_asset.webp'), // 6
-      _load('assets/assets/trolley_3_asset.webp'), // 7
-      _load('assets/assets/bg_start_asset.webp'), // 8
-      _load('assets/assets/bg_ostrovok_asset.webp'), // 9
-      _load('assets/assets/bg_s_ostrovkam_asset.webp'), // 10
-      _load('assets/assets/bg_relsa_asset.webp'), // 11
-      _load('assets/assets/bg_s_relsami-elementor-io-optimized.webp'), // 12
-      _load('assets/assets/bg_relsa-elementor-io-optimized.webp'), // 13
-      _load('assets/assets/bg_relsa_ostrovok_asset.webp'), // 14
-      _load('assets/assets/tree_asset.webp'), // 15
-      _load('assets/assets/tree_asset_2.webp'), // 16
-      _load('assets/assets/tree_asset_3.webp'), // 17
-      _load('assets/assets/torch_asset.webp'), // 18
-      _load('assets/assets/torch_asset-elementor-io-optimized.webp'), // 19
+      _load('assets/assets/player.webp'), // 2
+      _load('assets/assets/player_dead.webp'), // 3
+      _load('assets/assets/player_fired.webp'), // 4
+      _load('assets/assets/cart_1.webp'), // 5
+      _load('assets/assets/cart_2.webp'), // 6
+      _load('assets/assets/cart_3.webp'), // 7
+      _load('assets/assets/bg_start.webp'), // 8
+      _load('assets/assets/bg_island.webp'), // 9
+      _load('assets/assets/bg_islands.webp'), // 10
+      _load('assets/assets/bg_rail.webp'), // 11
+      _load('assets/assets/bg_rail_alt.webp'), // 12
+      _load('assets/assets/bg_rail_mix.webp'), // 13
+      _load('assets/assets/bg_rail_island.webp'), // 14
+      _load('assets/assets/tree_1.webp'), // 15
+      _load('assets/assets/tree_2.webp'), // 16
+      _load('assets/assets/tree_3.webp'), // 17
+      _load('assets/assets/torch_1.webp'), // 18
+      _load('assets/assets/torch_2.webp'), // 19
     ]);
 
     gameName = results[0];
