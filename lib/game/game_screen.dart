@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../app.dart';
 import 'game_assets.dart';
 import 'game_engine.dart';
@@ -262,7 +263,50 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 _Hint(icon: Icons.swipe, text: 'Swipe controls only'),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () => launchUrl(
+                    Uri.parse('https://adventtureroad.com/privacy-policy.html'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    'Privacy Policy',
+                    style: TextStyle(
+                      color: Color(0xFF7B8AAB),
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                const Text('·', style: TextStyle(color: Color(0xFF4A5568), fontSize: 11)),
+                TextButton(
+                  onPressed: () => launchUrl(
+                    Uri.parse('https://adventtureroad.com/support.html'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    'Support',
+                    style: TextStyle(
+                      color: Color(0xFF7B8AAB),
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
