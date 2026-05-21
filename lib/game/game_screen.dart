@@ -23,8 +23,6 @@ class GameScreen extends StatefulWidget {
   static const String bestDistanceKey = 'dungeon_best_distance';
   static const String totalCoinsKey = 'dungeon_total_coins';
 
-  static const MethodChannel _orientationChannel = MethodChannel('app/orientation');
-
   @override
   State<GameScreen> createState() => _GameScreenState();
 }
@@ -43,7 +41,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    GameScreen._orientationChannel.invokeMethod('lock');
     SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp]);
     _engine.highScore = widget.initialProgress.highScore;
     _engine.bestDistance = widget.initialProgress.bestDistance;

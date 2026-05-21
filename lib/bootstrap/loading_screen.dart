@@ -14,8 +14,6 @@ class LoadingScreen extends StatefulWidget {
       runBootstrap;
   final Future<void> Function(PlayerProgress progress) onComplete;
 
-  static const MethodChannel _orientationChannel = MethodChannel('app/orientation');
-
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
 }
@@ -38,7 +36,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    LoadingScreen._orientationChannel.invokeMethod('unlock');
     SystemChrome.setPreferredOrientations(const [
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
