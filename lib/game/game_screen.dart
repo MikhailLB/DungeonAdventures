@@ -269,8 +269,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               children: [
                 TextButton(
                   onPressed: () => launchUrl(
-                    Uri.parse('https://adventtureroad.com/privacy-policy.html'),
-                    mode: LaunchMode.externalApplication,
+                    Uri.parse('https://dungeonadventtures.com/privacy-policy.html'),
+                    mode: LaunchMode.inAppWebView,
                   ),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -288,8 +288,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 const Text('·', style: TextStyle(color: Color(0xFF4A5568), fontSize: 11)),
                 TextButton(
                   onPressed: () => launchUrl(
-                    Uri.parse('https://adventtureroad.com/support.html'),
-                    mode: LaunchMode.externalApplication,
+                    Uri.parse('https://dungeonadventtures.com/support.html'),
+                    mode: LaunchMode.inAppWebView,
                   ),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
