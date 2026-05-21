@@ -19,7 +19,7 @@ import UIKit
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
     guard let messenger = engineBridge.pluginRegistry
-      .registrar(forPlugin: "OrientationLock")?.messenger else { return }
+      .registrar(forPlugin: "OrientationLock")?.messenger() else { return }
     let channel = FlutterMethodChannel(name: "app/orientation", binaryMessenger: messenger)
     channel.setMethodCallHandler { call, result in
       switch call.method {
