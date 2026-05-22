@@ -52,23 +52,24 @@ class _BootstrapFlowState extends State<_BootstrapFlow> {
 
   Future<PlayerProgress> _bootstrap(ValueChanged<int> onStageChanged) async {
     onStageChanged(0);
-    await Future<void>.delayed(const Duration(milliseconds: 250));
 
-    onStageChanged(1);
-    await _assets.loadAll();
-    await Future<void>.delayed(const Duration(milliseconds: 250));
+    // Drive the loading bar from real per-image progress rather than fixed delays.
+    // stage 1 → first image done, stage 2 → halfway through images.
+    await _assets.loadAll(onProgress: (done, total) {
+      if (done == 1) onStageChanged(1);
+      if (done == total ~/ 2) onStageChanged(2);
+    });
 
-    onStageChanged(2);
     final prefs = await SharedPreferences.getInstance();
     final progress = PlayerProgress(
       highScore: prefs.getInt(GameScreen.highScoreKey) ?? 0,
       bestDistance: prefs.getInt(GameScreen.bestDistanceKey) ?? 0,
       totalCoins: prefs.getInt(GameScreen.totalCoinsKey) ?? 0,
     );
-    await Future<void>.delayed(const Duration(milliseconds: 250));
 
     onStageChanged(3);
-    await Future<void>.delayed(const Duration(milliseconds: 350));
+    // Brief pause so the "full" bar is visible before transition.
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     return progress;
   }
 

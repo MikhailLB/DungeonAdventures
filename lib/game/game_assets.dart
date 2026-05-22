@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-import 'package:flutter/services.dart';
 
 enum CartType { trolley1, trolley2, trolley3 }
 
@@ -37,54 +36,65 @@ class GameAssets {
   late ui.Image torch;
   late ui.Image torchAlt;
 
-  Future<void> loadAll() async {
-    if (loaded) {
-      return;
+  static const _paths = [
+    'assets/title.webp',                   // 0
+    'assets/assets/logo.webp',             // 1
+    'assets/assets/player.webp',           // 2
+    'assets/assets/player_dead.webp',      // 3
+    'assets/assets/player_fired.webp',     // 4
+    'assets/assets/cart_1.webp',           // 5
+    'assets/assets/cart_2.webp',           // 6
+    'assets/assets/cart_3.webp',           // 7
+    'assets/assets/bg_start.webp',         // 8
+    'assets/assets/bg_island.webp',        // 9
+    'assets/assets/bg_islands.webp',       // 10
+    'assets/assets/bg_rail.webp',          // 11
+    'assets/assets/bg_rail_alt.webp',      // 12
+    'assets/assets/bg_rail_mix.webp',      // 13
+    'assets/assets/bg_rail_island.webp',   // 14
+    'assets/assets/tree_1.webp',           // 15
+    'assets/assets/tree_2.webp',           // 16
+    'assets/assets/tree_3.webp',           // 17
+    'assets/assets/torch_1.webp',          // 18
+    'assets/assets/torch_2.webp',          // 19
+  ];
+
+  Future<void> loadAll({void Function(int done, int total)? onProgress}) async {
+    if (loaded) return;
+
+    int done = 0;
+    final total = _paths.length;
+
+    Future<ui.Image> loadOne(String path) async {
+      final img = await _load(path);
+      onProgress?.call(++done, total);
+      return img;
     }
 
-    final results = await Future.wait<ui.Image>([
-      _load('assets/title.webp'), // 0
-      _load('assets/assets/logo.webp'), // 1
-      _load('assets/assets/player.webp'), // 2
-      _load('assets/assets/player_dead.webp'), // 3
-      _load('assets/assets/player_fired.webp'), // 4
-      _load('assets/assets/cart_1.webp'), // 5
-      _load('assets/assets/cart_2.webp'), // 6
-      _load('assets/assets/cart_3.webp'), // 7
-      _load('assets/assets/bg_start.webp'), // 8
-      _load('assets/assets/bg_island.webp'), // 9
-      _load('assets/assets/bg_islands.webp'), // 10
-      _load('assets/assets/bg_rail.webp'), // 11
-      _load('assets/assets/bg_rail_alt.webp'), // 12
-      _load('assets/assets/bg_rail_mix.webp'), // 13
-      _load('assets/assets/bg_rail_island.webp'), // 14
-      _load('assets/assets/tree_1.webp'), // 15
-      _load('assets/assets/tree_2.webp'), // 16
-      _load('assets/assets/tree_3.webp'), // 17
-      _load('assets/assets/torch_1.webp'), // 18
-      _load('assets/assets/torch_2.webp'), // 19
-    ]);
+    final results = await Future.wait<ui.Image>(
+      _paths.map(loadOne),
+    );
 
-    gameName = results[0];
-    logo = results[1];
-    turkeyAlive = results[2];
-    turkeyDead = results[3];
-    turkeyFired = results[4];
-    trolley1 = results[5];
-    trolley2 = results[6];
-    trolley3 = results[7];
-    bgStart = results[8];
-    bgSafe = results[9];
-    bgSafeAlt = results[10];
-    bgRail = results[11];
-    bgRailAlt = results[12];
-    bgRailMix = results[13];
+    gameName     = results[0];
+    logo         = results[1];
+    turkeyAlive  = results[2];
+    turkeyDead   = results[3];
+    turkeyFired  = results[4];
+    trolley1     = results[5];
+    trolley2     = results[6];
+    trolley3     = results[7];
+    bgStart      = results[8];
+    bgSafe       = results[9];
+    bgSafeAlt    = results[10];
+    bgRail       = results[11];
+    bgRailAlt    = results[12];
+    bgRailMix    = results[13];
     bgRailIsland = results[14];
-    tree = results[15];
-    tree2 = results[16];
-    tree3 = results[17];
-    torch = results[18];
-    torchAlt = results[19];
+    tree         = results[15];
+    tree2        = results[16];
+    tree3        = results[17];
+    torch        = results[18];
+    torchAlt     = results[19];
     loaded = true;
   }
 
@@ -112,9 +122,12 @@ class GameAssets {
 
   ui.Image torchImage(bool alternate) => alternate ? torchAlt : torch;
 
+  /// Decodes an asset image via ImmutableBuffer — avoids the extra Uint8List
+  /// copy that rootBundle.load() + instantiateImageCodec() would perform.
   Future<ui.Image> _load(String path) async {
-    final data = await rootBundle.load(path);
-    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final buffer = await ui.ImmutableBuffer.fromAsset(path);
+    final descriptor = await ui.ImageDescriptor.encoded(buffer);
+    final codec = await descriptor.instantiateCodec();
     final frame = await codec.getNextFrame();
     return frame.image;
   }
