@@ -17,36 +17,16 @@ class PlayerProgress {
   });
 }
 
-class DungeonAdventuresApp extends StatelessWidget {
-  const DungeonAdventuresApp({super.key});
+/// White fallback: game loading screen → GameScreen.
+/// Used as [fallbackHomeBuilder] by [GrayBoot.buildHome()].
+class DungeonBootstrap extends StatefulWidget {
+  const DungeonBootstrap({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Dungeon Adventures',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFFFC853),
-          secondary: Color(0xFF66BB6A),
-          surface: Color(0xFF0F111A),
-        ),
-        scaffoldBackgroundColor: const Color(0xFF0A0B10),
-      ),
-      home: const _BootstrapFlow(),
-    );
-  }
+  State<DungeonBootstrap> createState() => _DungeonBootstrapState();
 }
 
-class _BootstrapFlow extends StatefulWidget {
-  const _BootstrapFlow();
-
-  @override
-  State<_BootstrapFlow> createState() => _BootstrapFlowState();
-}
-
-class _BootstrapFlowState extends State<_BootstrapFlow> {
+class _DungeonBootstrapState extends State<DungeonBootstrap> {
   final GameAssets _assets = GameAssets();
   PlayerProgress? _progress;
 
@@ -76,13 +56,8 @@ class _BootstrapFlowState extends State<_BootstrapFlow> {
     await SystemChrome.setPreferredOrientations(
       const [DeviceOrientation.portraitUp],
     );
-
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _progress = progress;
-    });
+    if (!mounted) return;
+    setState(() => _progress = progress);
   }
 
   @override
@@ -93,7 +68,6 @@ class _BootstrapFlowState extends State<_BootstrapFlow> {
         onComplete: _onLoadingComplete,
       );
     }
-
     return GameScreen(
       assets: _assets,
       initialProgress: _progress!,

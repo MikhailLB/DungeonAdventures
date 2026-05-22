@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app.dart';
+import '../gray/config/gateway_endpoints.dart';
 import 'game_assets.dart';
 import 'game_engine.dart';
 import 'game_painter.dart';
@@ -267,40 +268,34 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () => launchUrl(
-                    Uri.parse('https://adventtureroad.com/privacy-policy.html'),
+                GestureDetector(
+                  onTap: () => launchUrl(
+                    Uri.parse(GatewayEndpoints.privacyUrl),
                     mode: LaunchMode.externalApplication,
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
+                  child: Text(
                     'Privacy Policy',
                     style: TextStyle(
-                      color: Color(0xFF7B8AAB),
+                      color: Colors.white.withValues(alpha: 0.35),
                       fontSize: 11,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white.withValues(alpha: 0.2),
                     ),
                   ),
                 ),
-                const Text('·', style: TextStyle(color: Color(0xFF4A5568), fontSize: 11)),
-                TextButton(
-                  onPressed: () => launchUrl(
-                    Uri.parse('https://adventtureroad.com/support.html'),
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () => launchUrl(
+                    Uri.parse(GatewayEndpoints.supportUrl),
                     mode: LaunchMode.externalApplication,
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
+                  child: Text(
                     'Support',
                     style: TextStyle(
-                      color: Color(0xFF7B8AAB),
+                      color: Colors.white.withValues(alpha: 0.35),
                       fontSize: 11,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white.withValues(alpha: 0.2),
                     ),
                   ),
                 ),
