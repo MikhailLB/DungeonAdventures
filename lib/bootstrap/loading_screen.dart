@@ -172,14 +172,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 ),
               ),
               SafeArea(
-                // Guarantee at least 16 dp of breathing room on every edge so
-                // the loading bar never slides under the Dynamic Island / notch
-                // in landscape mode on iPhones.
-                minimum: const EdgeInsets.all(16),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: orientation == Orientation.landscape ? 48 : 24,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
                       const Spacer(),
