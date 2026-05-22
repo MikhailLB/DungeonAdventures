@@ -236,27 +236,23 @@ class _BrowserShellState extends State<BrowserShell>
       child: Scaffold(
         backgroundColor: Colors.black,
         resizeToAvoidBottomInset: false,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).orientation == Orientation.landscape
-                    ? 0
-                    : MediaQuery.of(context).viewPadding.top,
-              ),
-              child: WebViewWidget(controller: _wv),
-            ),
-            if (_loading)
-              Container(
-                color: Colors.black.withValues(alpha: 0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC853)),
+        body: SafeArea(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              WebViewWidget(controller: _wv),
+              if (_loading)
+                Container(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFFFFC853)),
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
