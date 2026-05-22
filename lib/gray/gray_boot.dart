@@ -433,8 +433,14 @@ class _GrayPipelineState extends State<_GrayPipeline> {
             ),
           ),
           SafeArea(
+            minimum: const EdgeInsets.all(16),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).orientation ==
+                        Orientation.landscape
+                    ? 48
+                    : 24,
+              ),
               child: Column(
                 children: [
                   const Spacer(),
