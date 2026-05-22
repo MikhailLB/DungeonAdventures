@@ -79,8 +79,8 @@ class _NetworkPauseScreenState extends State<NetworkPauseScreen>
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final bgAsset = isLandscape
-        ? 'assets/NoWifi/16x9_NoWifi_screen.webp'
-        : 'assets/NoWifi/9x16_NoWifi_screen.webp';
+        ? 'assets/NoWifi/nowifi_landscape.webp'
+        : 'assets/NoWifi/nowifi_portrait.webp';
     final topPad = MediaQuery.of(context).viewPadding.top;
 
     return Scaffold(

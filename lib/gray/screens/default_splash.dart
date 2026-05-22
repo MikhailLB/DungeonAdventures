@@ -20,10 +20,10 @@ class DefaultGraySplash extends StatefulWidget {
 
 class _DefaultGraySplashState extends State<DefaultGraySplash> {
   static const _bars = [
-    'assets/loading/loading_bar_empty.webp',
-    'assets/loading/loading_bar_half.webp',
-    'assets/loading/loading_bar_almost.webp',
-    'assets/loading/loading_bar_full.webp',
+    'assets/loading/bar_0.webp',
+    'assets/loading/bar_1.webp',
+    'assets/loading/bar_2.webp',
+    'assets/loading/bar_3.webp',
   ];
 
   VideoPlayerController? _vid;
@@ -64,8 +64,8 @@ class _DefaultGraySplashState extends State<DefaultGraySplash> {
     _activeOrientation = orientation;
     final token = ++_vidToken;
     final path = orientation == Orientation.landscape
-        ? 'assets/loading/16x9_loading_screen.mp4'
-        : 'assets/loading/9x16_loading_screen.mp4';
+        ? 'assets/loading/splash_landscape.mp4'
+        : 'assets/loading/splash_portrait.mp4';
 
     final old = _vid;
     final ctrl = VideoPlayerController.asset(path);

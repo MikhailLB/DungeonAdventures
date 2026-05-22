@@ -64,8 +64,8 @@ class _NotifyOfferScreenState extends State<NotifyOfferScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final bgAsset = isLandscape
-        ? 'assets/Notifications/16x9_Notifications.webp'
-        : 'assets/Notifications/9x16_Notifications.webp';
+        ? 'assets/Notifications/notification_landscape.webp'
+        : 'assets/Notifications/notification_portrait.webp';
 
     return Scaffold(
       backgroundColor: Colors.black,

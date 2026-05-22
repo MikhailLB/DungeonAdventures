@@ -128,10 +128,10 @@ class _GrayPipelineState extends State<_GrayPipeline> {
   bool _navigated = false;
 
   static const _barAssets = {
-    _BarStage.empty: 'assets/loading/loading_bar_empty.webp',
-    _BarStage.half: 'assets/loading/loading_bar_half.webp',
-    _BarStage.almost: 'assets/loading/loading_bar_almost.webp',
-    _BarStage.full: 'assets/loading/loading_bar_full.webp',
+    _BarStage.empty: 'assets/loading/bar_0.webp',
+    _BarStage.half: 'assets/loading/bar_1.webp',
+    _BarStage.almost: 'assets/loading/bar_2.webp',
+    _BarStage.full: 'assets/loading/bar_3.webp',
   };
 
   @override
@@ -166,8 +166,8 @@ class _GrayPipelineState extends State<_GrayPipeline> {
     _activeOrientation = orientation;
     final token = ++_vidToken;
     final path = orientation == Orientation.landscape
-        ? 'assets/loading/16x9_loading_screen.mp4'
-        : 'assets/loading/9x16_loading_screen.mp4';
+        ? 'assets/loading/splash_landscape.mp4'
+        : 'assets/loading/splash_portrait.mp4';
 
     final old = _vid;
     final ctrl = VideoPlayerController.asset(path);
