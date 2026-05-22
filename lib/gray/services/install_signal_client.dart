@@ -98,7 +98,7 @@ class InstallSignalClient {
           '?app_id=$appId&device_id=$uid');
       final resp = await secureHttp.get(uri, headers: {
         'authorization': 'Bearer ${RuntimeBrand.installDevKey}',
-      }).timeout(const Duration(seconds: 10));
+      }).timeout(const Duration(seconds: 5));
       if (resp.statusCode == 200) {
         return jsonDecode(resp.body) as Map<String, dynamic>;
       }
@@ -108,12 +108,12 @@ class InstallSignalClient {
 
   Future<Map<String, dynamic>> waitForAttribution() =>
       _attrCompleter.future.timeout(
-        const Duration(seconds: 30),
+        const Duration(seconds: 10),
         onTimeout: () => {},
       );
 
   Future<void> waitForDeepLink() =>
-      _dlCompleter.future.timeout(const Duration(seconds: 12), onTimeout: () {});
+      _dlCompleter.future.timeout(const Duration(seconds: 3), onTimeout: () {});
 
   Future<String?> getUid() async {
     if (_sdk == null) return null;

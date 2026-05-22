@@ -276,7 +276,7 @@ class _GrayPipelineState extends State<_GrayPipeline> {
     await Future.wait([
       widget.signal
           .waitForAttribution()
-          .timeout(const Duration(seconds: 10), onTimeout: () => {}),
+          .timeout(const Duration(seconds: 6), onTimeout: () => {}),
       widget.signal.waitForDeepLink(),
     ]);
 

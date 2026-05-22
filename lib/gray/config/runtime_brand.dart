@@ -22,7 +22,7 @@ class RuntimeBrand {
   static const String iosAppId = '0000000000'; // iOS placeholder
 
   static const int notificationRetryDelaySeconds = 259200;
-  static const int syncRetrySeconds = 5;
+  static const int syncRetrySeconds = 2;
 
   static String get installDevKey => Platform.isIOS ? '' : um(_installKeyAndroid);
 
