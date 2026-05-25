@@ -374,12 +374,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Skins are coming soon. Animation and placeholders are ready.',
-                          style: TextStyle(color: Colors.white70, fontSize: 12.5),
-                          textAlign: TextAlign.center,
-                        ),
                         const SizedBox(height: 12),
                         Expanded(
                           child: GridView.builder(
@@ -391,7 +385,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               childAspectRatio: 1.05,
                             ),
                             itemBuilder: (context, index) {
+                              const skins = [
+                                ('COWBOY', 'assets/assets/turkey_cowboy_asset.webp'),
+                                ('FIRE', 'assets/assets/turkey_fire_asset.webp'),
+                                ('GHOST', 'assets/assets/turkey_ghost_asset.webp'),
+                              ];
                               final pulse = (sin(_engine.menuTime * 3 + index) + 1) / 2;
+                              final hasSkin = index < skins.length;
+                              final skinName = hasSkin ? skins[index].$1 : null;
+                              final skinAsset = hasSkin ? skins[index].$2 : null;
                               return Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF07090E),
@@ -403,13 +405,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                 ),
                                 child: Stack(
                                   children: [
-                                    const Positioned.fill(
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.question_mark_rounded,
-                                          size: 72,
-                                          color: Color(0xFF2F3747),
-                                        ),
+                                    Positioned.fill(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(13),
+                                        child: hasSkin
+                                            ? Image.asset(
+                                                skinAsset!,
+                                                fit: BoxFit.contain,
+                                              )
+                                            : const Center(
+                                                child: Icon(
+                                                  Icons.question_mark_rounded,
+                                                  size: 72,
+                                                  color: Color(0xFF2F3747),
+                                                ),
+                                              ),
                                       ),
                                     ),
                                     Positioned(
@@ -422,14 +432,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                           color: Colors.black.withValues(alpha: 0.65),
                                           borderRadius: BorderRadius.circular(20),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Icon(Icons.lock, color: Color(0xFFFFD54F), size: 13),
-                                            SizedBox(width: 4),
+                                            const Icon(Icons.lock, color: Color(0xFFFFD54F), size: 13),
+                                            const SizedBox(width: 4),
                                             Text(
-                                              'COMING SOON',
-                                              style: TextStyle(
+                                              hasSkin ? skinName! : 'COMING SOON',
+                                              style: const TextStyle(
                                                 color: Color(0xFFFFE082),
                                                 fontWeight: FontWeight.w800,
                                                 fontSize: 10.5,
