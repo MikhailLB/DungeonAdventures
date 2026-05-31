@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
-import '../app.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({
@@ -10,9 +9,8 @@ class LoadingScreen extends StatefulWidget {
     required this.onComplete,
   });
 
-  final Future<PlayerProgress> Function(ValueChanged<int> onStageChanged)
-      runBootstrap;
-  final Future<void> Function(PlayerProgress progress) onComplete;
+  final Future<void> Function(ValueChanged<int> onStageChanged) runBootstrap;
+  final Future<void> Function() onComplete;
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -53,7 +51,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   Future<void> _startBoot() async {
     try {
-      final progress = await widget.runBootstrap((stage) {
+      await widget.runBootstrap((stage) {
         if (!mounted) {
           return;
         }
@@ -69,7 +67,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       if (!mounted) {
         return;
       }
-      await widget.onComplete(progress);
+      await widget.onComplete();
     } catch (error) {
       if (!mounted) {
         return;
@@ -171,7 +169,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   ),
                 ),
               ),
-              SafeArea(
+              AnimatedOpacity(
+                opacity: (hasVideo || _errorText != null) ? 1 : 0,
+                duration: const Duration(milliseconds: 350),
+                child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
@@ -224,6 +225,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     ],
                   ),
                 ),
+              ),
               ),
             ],
           );

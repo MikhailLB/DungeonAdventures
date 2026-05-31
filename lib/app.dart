@@ -1,21 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'bootstrap/loading_screen.dart';
-import 'game/game_assets.dart';
-import 'game/game_screen.dart';
-
-class PlayerProgress {
-  final int highScore;
-  final int bestDistance;
-  final int totalCoins;
-
-  const PlayerProgress({
-    required this.highScore,
-    required this.bestDistance,
-    required this.totalCoins,
-  });
-}
+import 'cartlock/game_assets.dart';
+import 'cartlock/progress_store.dart';
+import 'screens/menu_screen.dart';
+import 'screens/ui_kit.dart';
 
 class DungeonAdventuresApp extends StatelessWidget {
   const DungeonAdventuresApp({super.key});
@@ -28,11 +18,12 @@ class DungeonAdventuresApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFFFC853),
-          secondary: Color(0xFF66BB6A),
-          surface: Color(0xFF0F111A),
+          primary: Dungeon.gold,
+          secondary: Dungeon.green,
+          surface: Dungeon.panel,
         ),
-        scaffoldBackgroundColor: const Color(0xFF0A0B10),
+        scaffoldBackgroundColor: Dungeon.bg,
+        useMaterial3: true,
       ),
       home: const _BootstrapFlow(),
     );
@@ -48,9 +39,10 @@ class _BootstrapFlow extends StatefulWidget {
 
 class _BootstrapFlowState extends State<_BootstrapFlow> {
   final GameAssets _assets = GameAssets();
-  PlayerProgress? _progress;
+  ProgressStore? _store;
+  bool _ready = false;
 
-  Future<PlayerProgress> _bootstrap(ValueChanged<int> onStageChanged) async {
+  Future<void> _bootstrap(ValueChanged<int> onStageChanged) async {
     onStageChanged(0);
     await Future<void>.delayed(const Duration(milliseconds: 250));
 
@@ -59,44 +51,32 @@ class _BootstrapFlowState extends State<_BootstrapFlow> {
     await Future<void>.delayed(const Duration(milliseconds: 250));
 
     onStageChanged(2);
-    final prefs = await SharedPreferences.getInstance();
-    final progress = PlayerProgress(
-      highScore: prefs.getInt(GameScreen.highScoreKey) ?? 0,
-      bestDistance: prefs.getInt(GameScreen.bestDistanceKey) ?? 0,
-      totalCoins: prefs.getInt(GameScreen.totalCoinsKey) ?? 0,
-    );
+    _store = await ProgressStore.create();
     await Future<void>.delayed(const Duration(milliseconds: 250));
 
     onStageChanged(3);
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-    return progress;
+    await Future<void>.delayed(const Duration(milliseconds: 300));
   }
 
-  Future<void> _onLoadingComplete(PlayerProgress progress) async {
+  Future<void> _onLoadingComplete() async {
     await SystemChrome.setPreferredOrientations(
       const [DeviceOrientation.portraitUp],
     );
-
     if (!mounted) {
       return;
     }
-    setState(() {
-      _progress = progress;
-    });
+    setState(() => _ready = true);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_progress == null) {
+    if (!_ready || _store == null) {
       return LoadingScreen(
         runBootstrap: _bootstrap,
         onComplete: _onLoadingComplete,
       );
     }
 
-    return GameScreen(
-      assets: _assets,
-      initialProgress: _progress!,
-    );
+    return MenuScreen(assets: _assets, store: _store!);
   }
 }
