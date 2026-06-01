@@ -40,6 +40,7 @@ end
 # before iOS displays them, even when the app is backgrounded or killed.
 target 'NotificationService' do
   use_frameworks!
+  platform :ios, '15.0'
   pod 'Firebase/Messaging'
 end
 
