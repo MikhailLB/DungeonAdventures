@@ -25,6 +25,11 @@ class VaultBrowser extends StatefulWidget {
   final NetProbe probe;
   final VoidCallback? onFirstPaint;
 
+  /// True when the browser is opened from a cold-start push tap (app was
+  /// killed). In this case the viewport needs special treatment because
+  /// WKWebView renders before SystemUiMode.immersiveSticky settles.
+  final bool coldStartPush;
+
   const VaultBrowser({
     super.key,
     required this.destination,
@@ -32,6 +37,7 @@ class VaultBrowser extends StatefulWidget {
     required this.relay,
     required this.probe,
     this.onFirstPaint,
+    this.coldStartPush = false,
   });
 
   @override
@@ -49,8 +55,19 @@ class _VaultBrowserState extends State<VaultBrowser>
   Widget? _fullscreenOverlay;
   void Function()? _hideOverlay;
 
+  // Cold-start stretch fix
+  bool _viewportReady = false;
+  bool _coldReloadDone = false;
+
   void _applyImmersive() =>
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  @override
+  void didChangeMetrics() {
+    // Triggered when viewPadding changes after immersive mode settles —
+    // rebuilds the safe-area padding so WebView gets the correct insets.
+    if (mounted) setState(() {});
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -58,6 +75,31 @@ class _VaultBrowserState extends State<VaultBrowser>
       _applyImmersive();
       _drainStash();
     }
+  }
+
+  /// Micro-rotation: forces WKWebView to recalculate its native frame,
+  /// equivalent to the user rotating the device and back.
+  Future<void> _nudgeLayout() async {
+    if (!Platform.isIOS) return;
+    await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeLeft]);
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
+
+  /// Full cold-start surface init: immersive → wait → nudge → wait.
+  Future<void> _initColdStartSurface() async {
+    _applyImmersive();
+    await Future.delayed(const Duration(milliseconds: 150));
+    if (!mounted) return;
+    await _nudgeLayout();
+    await Future.delayed(const Duration(milliseconds: 250));
   }
 
   @override
@@ -70,7 +112,6 @@ class _VaultBrowserState extends State<VaultBrowser>
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    _applyImmersive();
 
     late final PlatformWebViewControllerCreationParams params;
     if (Platform.isIOS) {
@@ -92,7 +133,20 @@ class _VaultBrowserState extends State<VaultBrowser>
       ..setNavigationDelegate(_buildDelegate());
 
     _configurePlatform();
-    _wv.loadRequest(Uri.parse(widget.destination));
+
+    if (widget.coldStartPush) {
+      // Defer WebView mount until the viewport is stable so WKWebView does
+      // not bake in wrong dimensions while the status bar is still visible.
+      _initColdStartSurface().then((_) {
+        if (!mounted) return;
+        setState(() => _viewportReady = true);
+        _wv.loadRequest(Uri.parse(widget.destination));
+      });
+    } else {
+      _applyImmersive();
+      _viewportReady = true;
+      _wv.loadRequest(Uri.parse(widget.destination));
+    }
 
     widget.relay.onPushUrl = (url) {
       if (!mounted) return;
@@ -132,12 +186,18 @@ class _VaultBrowserState extends State<VaultBrowser>
         _applyMediaAutoplay();
         Future.delayed(const Duration(milliseconds: 800), () {
           if (!mounted) return;
+          setState(() {}); // re-read viewPadding after immersive settles
           _wv.runJavaScript(
             'window.dispatchEvent(new Event("resize"));'
             'if(window.visualViewport)'
             '  window.visualViewport.dispatchEvent(new Event("resize"));',
           );
           _applyViewportFix();
+          // Cold-start: force the site to re-render once the viewport is stable.
+          if (widget.coldStartPush && !_coldReloadDone) {
+            _coldReloadDone = true;
+            _wv.reload();
+          }
         });
         if (!_firstPaintFired) {
           _firstPaintFired = true;
@@ -431,15 +491,21 @@ class _VaultBrowserState extends State<VaultBrowser>
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Padding(
-              padding: EdgeInsets.only(
-                top: safe.top,
-                bottom: safe.bottom,
-                left: safe.left,
-                right: safe.right,
-              ),
-              child: WebViewWidget(controller: _wv),
-            ),
+            // Don't mount WebViewWidget until the viewport is stable.
+            // On cold-start push this prevents WKWebView from baking in
+            // wrong dimensions while the status bar is still visible.
+            if (_viewportReady)
+              Padding(
+                padding: EdgeInsets.only(
+                  top: safe.top,
+                  bottom: safe.bottom,
+                  left: safe.left,
+                  right: safe.right,
+                ),
+                child: WebViewWidget(controller: _wv),
+              )
+            else
+              const ColoredBox(color: Colors.black),
             if (_fullscreenOverlay != null)
               Positioned.fill(child: _fullscreenOverlay!),
           ],

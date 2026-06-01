@@ -105,11 +105,10 @@ class _VaultSplashState extends State<VaultSplash> {
     // Must happen BEFORE any other async work to avoid race conditions.
     final nativeColdUrl = await ColdTapReader.consumeTapUrl();
     if (nativeColdUrl != null && nativeColdUrl.isNotEmpty) {
-      hubLog(() => '[DGA.VS] native cold-start url → $nativeColdUrl');
       await widget.vault.writeMode(RouteMode.web);
       await widget.vault.consumeOneShotUrl();
       unawaited(_backgroundDispatch());
-      _openContent(nativeColdUrl);
+      _openContent(nativeColdUrl, coldStart: true);
       return;
     }
 
@@ -280,7 +279,7 @@ class _VaultSplashState extends State<VaultSplash> {
     return true;
   }
 
-  void _openContent(String url) {
+  void _openContent(String url, {bool coldStart = false}) {
     if (_routed) return;
     _routed = true;
     if (widget.vault.needsPushPrompt()) {
@@ -304,15 +303,15 @@ class _VaultSplashState extends State<VaultSplash> {
             ),
           ));
         } else {
-          _directBrowser(url);
+          _directBrowser(url, coldStart: coldStart);
         }
       });
     } else {
-      _directBrowser(url);
+      _directBrowser(url, coldStart: coldStart);
     }
   }
 
-  void _directBrowser(String url) {
+  void _directBrowser(String url, {bool coldStart = false}) {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(MaterialPageRoute(
       builder: (_) => VaultBrowser(
@@ -320,6 +319,7 @@ class _VaultSplashState extends State<VaultSplash> {
         vault: widget.vault,
         relay: widget.relay,
         probe: widget.probe,
+        coldStartPush: coldStart,
       ),
     ));
   }
