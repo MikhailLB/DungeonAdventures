@@ -38,10 +38,13 @@ end
 
 # NSE needs Firebase/Messaging to attach rich media images to push notifications
 # before iOS displays them, even when the app is backgrounded or killed.
+# Pin to the exact Firebase version the firebase_messaging plugin resolves to,
+# otherwise CocoaPods pulls the latest Firebase (higher iOS minimum) and it
+# conflicts with the Runner's pinned version.
 target 'NotificationService' do
   use_frameworks!
   platform :ios, '15.0'
-  pod 'Firebase/Messaging'
+  pod 'Firebase/Messaging', '12.14.0'
 end
 
 post_install do |installer|
