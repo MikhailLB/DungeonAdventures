@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'bootstrap/loading_screen.dart';
 import 'cartlock/game_assets.dart';
 import 'cartlock/progress_store.dart';
+import 'hub/infra/dungeon_vault.dart';
+import 'hub/infra/hub_dispatch.dart';
+import 'hub/infra/install_tracker.dart';
+import 'hub/infra/net_probe.dart';
+import 'hub/infra/signal_relay.dart';
+import 'hub/pages/vault_splash.dart';
+import 'screens/level_select_screen.dart';
 import 'screens/menu_screen.dart';
+import 'screens/play_screen.dart';
+import 'screens/skins_screen.dart';
 import 'screens/ui_kit.dart';
 
+/// Root application widget.
+///
+/// When [gateEnabled] is true the gray-hub flow runs first (VaultSplash).
+/// Non-organic/returning users see the WebView; organic users land on the game
+/// (MenuScreen). When false (pure white build) the game launches directly.
 class DungeonAdventuresApp extends StatelessWidget {
-  const DungeonAdventuresApp({super.key});
+  final DungeonVault vault;
+  final NetProbe probe;
+  final InstallTracker tracker;
+  final HubDispatch dispatch;
+  final SignalRelay relay;
+  final bool gateEnabled;
+
+  const DungeonAdventuresApp({
+    super.key,
+    required this.vault,
+    required this.probe,
+    required this.tracker,
+    required this.dispatch,
+    required this.relay,
+    required this.gateEnabled,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,58 +53,141 @@ class DungeonAdventuresApp extends StatelessWidget {
         scaffoldBackgroundColor: Dungeon.bg,
         useMaterial3: true,
       ),
-      home: const _BootstrapFlow(),
+      home: gateEnabled
+          ? _GatedBootstrap(
+              vault: vault,
+              probe: probe,
+              tracker: tracker,
+              dispatch: dispatch,
+              relay: relay,
+            )
+          : const _WhiteBootstrap(),
+      routes: {
+        // All white-part routes must be registered here so that navigation
+        // from the gray flow never throws "Could not find route".
+        '/menu': (ctx) => _menuOrLoadingFallback(ctx),
+        '/level-select': (ctx) => _levelSelectFallback(ctx),
+        '/skins': (ctx) => _skinsFallback(ctx),
+      },
     );
   }
+
+  static Widget _menuOrLoadingFallback(BuildContext ctx) =>
+      const _WhiteBootstrap();
+  static Widget _levelSelectFallback(BuildContext ctx) =>
+      const _WhiteBootstrap();
+  static Widget _skinsFallback(BuildContext ctx) => const _WhiteBootstrap();
 }
 
-class _BootstrapFlow extends StatefulWidget {
-  const _BootstrapFlow();
+// ── Gated path: VaultSplash routes to MenuScreen after game decision ─────────
+class _GatedBootstrap extends StatelessWidget {
+  final DungeonVault vault;
+  final NetProbe probe;
+  final InstallTracker tracker;
+  final HubDispatch dispatch;
+  final SignalRelay relay;
+
+  const _GatedBootstrap({
+    required this.vault,
+    required this.probe,
+    required this.tracker,
+    required this.dispatch,
+    required this.relay,
+  });
 
   @override
-  State<_BootstrapFlow> createState() => _BootstrapFlowState();
+  Widget build(BuildContext context) {
+    return VaultSplash(
+      vault: vault,
+      probe: probe,
+      tracker: tracker,
+      dispatch: dispatch,
+      relay: relay,
+      // When the hub resolves to game: go directly to white part bootstrap.
+      // VaultSplash already served as the loading experience — don't double it.
+      onLaunchGame: () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const _WhiteBootstrap()),
+        );
+      },
+    );
+  }
 }
 
-class _BootstrapFlowState extends State<_BootstrapFlow> {
+// ── White bootstrap: loads assets then goes to MenuScreen ────────────────────
+class _WhiteBootstrap extends StatefulWidget {
+  const _WhiteBootstrap();
+
+  @override
+  State<_WhiteBootstrap> createState() => _WhiteBootstrapState();
+}
+
+class _WhiteBootstrapState extends State<_WhiteBootstrap> {
   final GameAssets _assets = GameAssets();
   ProgressStore? _store;
-  bool _ready = false;
 
-  Future<void> _bootstrap(ValueChanged<int> onStageChanged) async {
-    onStageChanged(0);
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-
-    onStageChanged(1);
-    await _assets.loadAll();
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-
-    onStageChanged(2);
-    _store = await ProgressStore.create();
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-
-    onStageChanged(3);
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+  @override
+  void initState() {
+    super.initState();
+    _init();
   }
 
-  Future<void> _onLoadingComplete() async {
+  Future<void> _init() async {
     await SystemChrome.setPreferredOrientations(
-      const [DeviceOrientation.portraitUp],
-    );
-    if (!mounted) {
-      return;
-    }
-    setState(() => _ready = true);
+        const [DeviceOrientation.portraitUp]);
+    await _assets.loadAll();
+    final store = await ProgressStore.create();
+    if (!mounted) return;
+    setState(() => _store = store);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_ready || _store == null) {
-      return LoadingScreen(
-        runBootstrap: _bootstrap,
-        onComplete: _onLoadingComplete,
+    final store = _store;
+    if (store == null) {
+      return const Scaffold(
+        backgroundColor: Dungeon.bg,
+        body: Center(
+          child: CircularProgressIndicator(color: Dungeon.gold),
+        ),
       );
     }
+    return MenuScreen(assets: _assets, store: store);
+  }
+}
 
-    return MenuScreen(assets: _assets, store: _store!);
+// ── Route helpers that carry assets/store through named routes ────────────────
+// These are only used if something navigates via named routes from the gray flow.
+// The primary path goes through _WhiteBootstrap → MenuScreen directly.
+Route<dynamic>? onGenerateRoute(
+  RouteSettings settings,
+  GameAssets assets,
+  ProgressStore store,
+) {
+  switch (settings.name) {
+    case '/menu':
+      return MaterialPageRoute(
+        builder: (_) => MenuScreen(assets: assets, store: store),
+      );
+    case '/level-select':
+      return MaterialPageRoute(
+        builder: (_) => LevelSelectScreen(assets: assets, store: store),
+      );
+    case '/skins':
+      return MaterialPageRoute(
+        builder: (_) => SkinsScreen(store: store),
+      );
+    case '/play':
+      final args = settings.arguments as Map<String, dynamic>?;
+      final levelId = args?['levelId'] as int? ?? 1;
+      return MaterialPageRoute(
+        builder: (_) => PlayScreen(
+          assets: assets,
+          store: store,
+          startLevelId: levelId,
+        ),
+      );
+    default:
+      return null;
   }
 }
