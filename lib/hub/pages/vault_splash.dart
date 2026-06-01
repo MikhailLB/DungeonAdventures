@@ -15,6 +15,7 @@ import '../models/route_mode.dart';
 import 'offline_screen.dart';
 import 'signal_screen.dart';
 import 'vault_browser.dart';
+import '../infra/hub_log.dart';
 
 enum _LoadStep { empty, midway, done }
 
@@ -104,7 +105,7 @@ class _VaultSplashState extends State<VaultSplash> {
     // Must happen BEFORE any other async work to avoid race conditions.
     final nativeColdUrl = await ColdTapReader.consumeTapUrl();
     if (nativeColdUrl != null && nativeColdUrl.isNotEmpty) {
-      debugPrint('[DGA.VS] native cold-start url → $nativeColdUrl');
+      hubLog(() => '[DGA.VS] native cold-start url → $nativeColdUrl');
       await widget.vault.writeMode(RouteMode.web);
       await widget.vault.consumeOneShotUrl();
       unawaited(_backgroundDispatch());
@@ -161,7 +162,7 @@ class _VaultSplashState extends State<VaultSplash> {
       );
       await widget.dispatch.send(body);
     } catch (e) {
-      debugPrint('[DGA.VS] background dispatch error: $e');
+      hubLog(() => '[DGA.VS] background dispatch error: $e');
     }
   }
 

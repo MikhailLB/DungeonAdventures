@@ -21,8 +21,8 @@ String _iosUa(String ver) {
 }
 
 String _fallback() => Platform.isAndroid
-    ? _androidUa(sdk: 14, brand: 'Google', model: 'Pixel 8', build: 'UP1A.231005.007')
-    : _iosUa('17.4');
+    ? _androidUa(sdk: 15, brand: 'samsung', model: 'SM-S921B', build: 'AP3A.240905.015.A2')
+    : _iosUa('18.1');
 
 /// HTTP client that injects a realistic mobile-browser User-Agent derived from
 /// the actual device info — varies per device, not a static fingerprint.

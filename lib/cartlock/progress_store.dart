@@ -13,12 +13,14 @@ class ProgressStore extends ChangeNotifier {
   static const String _starsKey = 'cartlock_stars'; // "id:stars,id:stars"
   static const String _skinKey = 'cartlock_skin';
   static const String _tutKey = 'cartlock_tutorial_seen';
+  static const String _avatarKey = 'cartlock_avatar_path';
 
   final SharedPreferences _prefs;
 
   final Map<int, int> _stars = <int, int>{};
   String _selectedSkinId = 'classic';
   bool _tutorialSeen = false;
+  String? _avatarPath;
 
   static Future<ProgressStore> create() async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,9 +44,23 @@ class ProgressStore extends ChangeNotifier {
     }
     _selectedSkinId = _prefs.getString(_skinKey) ?? 'classic';
     _tutorialSeen = _prefs.getBool(_tutKey) ?? false;
+    _avatarPath = _prefs.getString(_avatarKey);
   }
 
   bool get tutorialSeen => _tutorialSeen;
+
+  /// File path of the player's custom keeper portrait (camera/gallery), if set.
+  String? get avatarPath => _avatarPath;
+
+  Future<void> setAvatarPath(String? path) async {
+    _avatarPath = path;
+    if (path == null || path.isEmpty) {
+      await _prefs.remove(_avatarKey);
+    } else {
+      await _prefs.setString(_avatarKey, path);
+    }
+    notifyListeners();
+  }
 
   Future<void> markTutorialSeen() async {
     if (_tutorialSeen) {

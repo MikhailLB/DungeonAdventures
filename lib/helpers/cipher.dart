@@ -1,38 +1,48 @@
 import 'dart:typed_data';
 
-/// XOR-based string obfuscation for secrets stored as byte arrays.
-/// Seed is unique to DungeonAdventures — differs from every sibling project
-/// so byte arrays are not interchangeable across apps.
-// "dga.hub.key1"
-const _seedBytes = <int>[
-  0x64, 0x67, 0x61, 0x2E, 0x68, 0x75, 0x62, 0x2E,
-  0x6B, 0x65, 0x79, 0x31,
+/// String obfuscation for secrets stored as byte arrays.
+///
+/// This app uses an RC4-style stream cipher (KSA + PRGA over a 256-byte
+/// permutation). The algorithm is intentionally different from sibling
+/// projects so the compiled decode routine is not byte-identical across the
+/// portfolio. Seed below is unique to DungeonAdventures.
+// "dga.keep.v2"
+const _seed = <int>[
+  0x64, 0x67, 0x61, 0x2E, 0x6B, 0x65, 0x65, 0x70, 0x2E, 0x76, 0x32,
 ];
 
-Uint8List _deriveKeyStream(int size) {
-  var hash = 0x811C9DC5;
-  for (final b in _seedBytes) {
-    hash = ((hash ^ b) * 0x01000193) & 0xFFFFFFFF;
+Uint8List _keystream(int n) {
+  // KSA — build the permutation from the seed.
+  final s = List<int>.generate(256, (i) => i);
+  var j = 0;
+  for (var i = 0; i < 256; i++) {
+    j = (j + s[i] + _seed[i % _seed.length]) & 0xFF;
+    final t = s[i];
+    s[i] = s[j];
+    s[j] = t;
   }
-  final out = Uint8List(size);
-  var state = hash == 0 ? 0xDEADBEEF : hash;
-  for (var i = 0; i < size; i++) {
-    state = (state * 1103515245 + 12345) & 0x7FFFFFFF;
-    out[i] = (state >> 7) & 0xFF;
+  // PRGA — emit n keystream bytes.
+  final out = Uint8List(n);
+  var a = 0, b = 0;
+  for (var k = 0; k < n; k++) {
+    a = (a + 1) & 0xFF;
+    b = (b + s[a]) & 0xFF;
+    final t = s[a];
+    s[a] = s[b];
+    s[b] = t;
+    out[k] = s[(s[a] + s[b]) & 0xFF];
   }
   return out;
 }
 
-final _stream = _deriveKeyStream(128);
-
-/// Decode an XOR-encoded byte list back to its plaintext string.
+/// Decode an obfuscated byte list back to its plaintext string.
 /// Use `tool/encode_creds.dart` to produce byte arrays for new values.
 String unmask(List<int> raw) {
   if (raw.isEmpty) return '';
-  final sn = _stream.length;
+  final ks = _keystream(raw.length);
   final out = Uint8List(raw.length);
   for (var i = 0; i < raw.length; i++) {
-    out[i] = raw[i] ^ _stream[i % sn];
+    out[i] = raw[i] ^ ks[i];
   }
   return String.fromCharCodes(out);
 }

@@ -39,17 +39,10 @@ class SceneDelegate: FlutterSceneDelegate {
   static func extractUrl(from userInfo: [AnyHashable: Any]) -> String? {
     let keys = ["url", "link", "target", "deeplink", "deep_link"]
 
-    NSLog("[DGA.NATIVE] userInfo keys: %@",
-          userInfo.keys.map { "\($0)" }.joined(separator: ", "))
-    for (k, v) in userInfo {
-      NSLog("[DGA.NATIVE] userInfo[\(k)] = \(v)")
-    }
-
     func scan(_ map: [AnyHashable: Any]) -> String? {
       for key in keys {
         if let raw = map[key] as? String,
            !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-          NSLog("[DGA.NATIVE] found url via key '\(key)': %@", raw)
           return raw.trimmingCharacters(in: .whitespacesAndNewlines)
         }
       }
@@ -62,12 +55,13 @@ class SceneDelegate: FlutterSceneDelegate {
     if let nested = userInfo["payload"] as? [AnyHashable: Any],
        let url = scan(nested) { return url }
 
-    NSLog("[DGA.NATIVE] no url found in userInfo")
     return nil
   }
 
   static func persist(url: String) {
+    #if DEBUG
     NSLog("[DGA.NATIVE] cold-start tap url -> %@", url)
+    #endif
     let d = UserDefaults.standard
     d.set(url, forKey: tapUrlKey)
     d.synchronize()

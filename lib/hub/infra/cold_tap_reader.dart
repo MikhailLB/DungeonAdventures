@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'hub_log.dart';
 
 /// Reads the cold-start push URL that SceneDelegate captured before Dart was
 /// alive.
@@ -19,14 +19,14 @@ class ColdTapReader {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
       if (raw == null || raw.trim().isEmpty) {
-        debugPrint('[DGA.CTR] consumeTapUrl -> null');
+        hubLog(() => '[DGA.CTR] consumeTapUrl -> null');
         return null;
       }
       await prefs.remove(_key);
-      debugPrint('[DGA.CTR] consumeTapUrl -> "$raw"');
+      hubLog(() => '[DGA.CTR] consumeTapUrl -> "$raw"');
       return raw.trim();
     } catch (err) {
-      debugPrint('[DGA.CTR] consumeTapUrl failed: $err');
+      hubLog(() => '[DGA.CTR] consumeTapUrl failed: $err');
       return null;
     }
   }

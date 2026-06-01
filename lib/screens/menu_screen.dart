@@ -6,6 +6,7 @@ import '../cartlock/game_assets.dart';
 import '../cartlock/levels.dart';
 import '../cartlock/progress_store.dart';
 import '../cartlock/skins.dart';
+import 'avatar_badge.dart';
 import 'level_select_screen.dart';
 import 'play_screen.dart';
 import 'skins_screen.dart';
@@ -130,6 +131,8 @@ class _MenuScreenState extends State<MenuScreen>
                       const SizedBox(height: 8),
                       Row(
                         children: [
+                          AvatarBadge(store: widget.store),
+                          const SizedBox(width: 10),
                           StatChip(
                             icon: Icons.star_rounded,
                             label:

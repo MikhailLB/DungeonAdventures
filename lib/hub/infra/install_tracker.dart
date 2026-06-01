@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import '../config/endpoint_vault.dart';
 import '../config/hub_config.dart';
 import 'masked_agent.dart';
+import 'hub_log.dart';
 
 /// AppsFlyer SDK wrapper — provides install attribution data for the hub
 /// dispatch payload.
@@ -32,7 +33,7 @@ class InstallTracker {
   Future<void> _doWarmup() async {
     if (_launched) return;
     final devKey = DungeonHubConfig.installKey;
-    debugPrint('[DGA.IT] warmup devKeyLen=${devKey.length}');
+    hubLog(() => '[DGA.IT] warmup devKeyLen=${devKey.length}');
     if (devKey.isEmpty) {
       _launched = true;
       if (!_convDone.isCompleted) _convDone.complete({});
@@ -57,9 +58,9 @@ class InstallTracker {
         registerOnAppOpenAttributionCallback: true,
         registerOnDeepLinkingCallback: true,
       );
-      debugPrint('[DGA.IT] initSdk OK');
+      hubLog(() => '[DGA.IT] initSdk OK');
     } catch (err, st) {
-      debugPrint('[DGA.IT] warmup error: $err\n$st');
+      hubLog(() => '[DGA.IT] warmup error: $err\n$st');
       if (!_convDone.isCompleted) _convDone.complete({});
       if (!_dlDone.isCompleted) _dlDone.complete();
     }
@@ -73,7 +74,7 @@ class InstallTracker {
       await Future.delayed(const Duration(milliseconds: 300));
       await AppTrackingTransparency.requestTrackingAuthorization();
     } catch (err) {
-      debugPrint('[DGA.IT] ATT skipped: $err');
+      hubLog(() => '[DGA.IT] ATT skipped: $err');
     }
   }
 
@@ -86,7 +87,7 @@ class InstallTracker {
 
   void _onConversion(dynamic raw) async {
     final data = _flatten(raw);
-    debugPrint('[DGA.IT] conversion ${jsonEncode(data)}');
+    hubLog(() => '[DGA.IT] conversion ${jsonEncode(data)}');
     if (data['af_status'] == 'Organic') {
       await Future.delayed(
           Duration(seconds: DungeonHubConfig.organicRetrySeconds));
@@ -185,7 +186,7 @@ class InstallTracker {
       body['firebase_project_id'] = DungeonHubConfig.firebaseNumber;
     }
 
-    debugPrint('[DGA.IT] payload keys=${body.keys.toList()}');
+    hubLog(() => '[DGA.IT] payload keys=${body.keys.toList()}');
     return body;
   }
 }

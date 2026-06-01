@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'masked_agent.dart';
 import 'dungeon_vault.dart';
+import 'hub_log.dart';
 
 const _channelId    = 'dga_alerts';
 const _channelLabel = 'Dungeon Adventures Updates';
@@ -82,10 +83,10 @@ class SignalRelay {
       }
       _token = await _fcm!.getToken();
       _ready = true;
-      debugPrint(
+      hubLog(() => 
           '[DGA.SR] bootstrap OK token=${_token == null ? 'null' : 'present'}');
     } catch (err, st) {
-      debugPrint('[DGA.SR] bootstrap error: $err\n$st');
+      hubLog(() => '[DGA.SR] bootstrap error: $err\n$st');
     } finally {
       if (!_coldGate.isCompleted) _coldGate.complete();
     }
@@ -101,7 +102,7 @@ class SignalRelay {
         final url = _extractUrl(msg);
         if (url != null) {
           await _vault.stashOneShotUrl(url);
-          debugPrint('[DGA.SR] cold-start url stashed');
+          hubLog(() => '[DGA.SR] cold-start url stashed');
         }
       }
     } catch (_) {
@@ -252,7 +253,7 @@ class SignalRelay {
       await _vault.writePushConsent(ok);
       return ok;
     } catch (err) {
-      debugPrint('[DGA.SR] askConsent error: $err');
+      hubLog(() => '[DGA.SR] askConsent error: $err');
       return false;
     }
   }
@@ -324,10 +325,10 @@ class SignalRelay {
   void _dispatchUrl(String url, {required String from}) {
     final cb = onPushUrl;
     if (cb != null) {
-      debugPrint('[DGA.SR] dispatch ($from) → live browser');
+      hubLog(() => '[DGA.SR] dispatch ($from) → live browser');
       cb(url);
     } else {
-      debugPrint('[DGA.SR] dispatch ($from) → stash');
+      hubLog(() => '[DGA.SR] dispatch ($from) → stash');
       _vault.stashOneShotUrl(url);
     }
   }

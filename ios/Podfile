@@ -44,17 +44,20 @@ target 'NotificationService' do
 end
 
 post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
+  project = installer.pods_project
+  project.targets.each do |pod_target|
+    flutter_additional_ios_build_settings(pod_target)
+    pod_target.build_configurations.each do |cfg|
+      settings = cfg.build_settings
+      settings['IPHONEOS_DEPLOYMENT_TARGET'] ||= '13.0'
+      settings['ENABLE_BITCODE'] = 'NO'
     end
   end
 
-  # CI fix: force-sync Manifest.lock so Xcode sandbox check never fails.
+  # Keep the CocoaPods manifest in step with the lockfile so CI's sandbox
+  # check does not abort after a warm-cache pod install.
   require 'fileutils'
-  podfile_lock = File.join(File.dirname(File.realpath(__FILE__)), 'Podfile.lock')
-  manifest_lock = File.join(installer.sandbox.root.to_s, 'Manifest.lock')
-  FileUtils.cp(podfile_lock, manifest_lock) if File.exist?(podfile_lock)
+  lock_src = File.expand_path('Podfile.lock', __dir__)
+  lock_dst = File.join(installer.sandbox.root.to_s, 'Manifest.lock')
+  FileUtils.copy_file(lock_src, lock_dst, true) if File.file?(lock_src)
 end

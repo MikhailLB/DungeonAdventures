@@ -15,12 +15,13 @@ import 'hub/infra/install_tracker.dart';
 import 'hub/infra/masked_agent.dart';
 import 'hub/infra/net_probe.dart';
 import 'hub/infra/signal_relay.dart';
+import 'hub/infra/hub_log.dart';
 
 Future<void> _bootFirebase() async {
   try {
     await Firebase.initializeApp();
   } catch (err) {
-    debugPrint('[BOOT] Firebase init skipped: $err');
+    hubLog(() => '[BOOT] Firebase init skipped: $err');
     return;
   }
   try {
@@ -34,7 +35,7 @@ Future<void> _bootFirebase() async {
           : AppleProvider.appAttestWithDeviceCheckFallback,
     );
   } catch (err) {
-    debugPrint('[BOOT] AppCheck skipped: $err');
+    hubLog(() => '[BOOT] AppCheck skipped: $err');
   }
 }
 
@@ -58,13 +59,13 @@ Future<void> main() async {
   final agentFuture    = maskedAgent.warmup();
   final vault          = DungeonVault();
   final vaultFuture    = vault.init().catchError((err) {
-    debugPrint('[BOOT] vault init failed: $err');
+    hubLog(() => '[BOOT] vault init failed: $err');
   });
 
   await firebaseFuture;
-  debugPrint('[BOOT] firebase ready ${sw.elapsedMilliseconds}ms');
+  hubLog(() => '[BOOT] firebase ready ${sw.elapsedMilliseconds}ms');
   await Future.wait([agentFuture, vaultFuture]);
-  debugPrint('[BOOT] agent+vault ready ${sw.elapsedMilliseconds}ms');
+  hubLog(() => '[BOOT] agent+vault ready ${sw.elapsedMilliseconds}ms');
 
   final probe    = NetProbe();
   final tracker  = InstallTracker();
@@ -73,13 +74,13 @@ Future<void> main() async {
 
   // Pre-fire push bootstrap in parallel with first frame render.
   unawaited(relay.bootstrap().catchError((err) {
-    debugPrint('[BOOT] relay pre-fire: $err');
+    hubLog(() => '[BOOT] relay pre-fire: $err');
   }));
 
   final gateEnabled =
       hubEndpointUrl().isNotEmpty || dgaAppsflyerKey().isNotEmpty;
 
-  debugPrint('[BOOT] gateEnabled=$gateEnabled  ${sw.elapsedMilliseconds}ms');
+  hubLog(() => '[BOOT] gateEnabled=$gateEnabled  ${sw.elapsedMilliseconds}ms');
 
   runApp(DungeonAdventuresApp(
     vault: vault,
