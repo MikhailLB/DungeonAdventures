@@ -85,17 +85,6 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXGroup section (NSE) */
-		D8DD82EB9EEDB6F9D958FBF9 /* NotificationService */ = {
-			isa = PBXGroup;
-			children = (
-				508C7FA4D7359F39065EC4A1 /* NotificationService.swift */,
-				146B01D4519819209040776F /* Info.plist */,
-			);
-			path = NotificationService;
-			sourceTree = "<group>";
-		};
-/* End PBXGroup section (NSE) */
 
 /* Begin PBXFrameworksBuildPhase section */
 		639A1B5296DFD359279AFC53 /* Frameworks (NSE) */ = {
@@ -114,6 +103,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D8DD82EB9EEDB6F9D958FBF9 /* NotificationService */ = {
+			isa = PBXGroup;
+			children = (
+				508C7FA4D7359F39065EC4A1 /* NotificationService.swift */,
+				146B01D4519819209040776F /* Info.plist */,
+			);
+			path = NotificationService;
+			sourceTree = "<group>";
+		};
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,6 +134,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				D8DD82EB9EEDB6F9D958FBF9 /* NotificationService */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
