@@ -2,7 +2,7 @@ name: dungeon_adventures
 description: "Cart Lock - a hand-crafted dungeon logic puzzle."
 publish_to: 'none'
 
-version: 1.0.3+7
+version: 1.0.3+8
 
 environment:
   sdk: ^3.11.4

@@ -483,7 +483,13 @@ class _VaultBrowserState extends State<VaultBrowser>
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
-        if (!didPop && _fullscreenOverlay != null) _hideOverlay?.call();
+        if (!didPop) {
+          if (_fullscreenOverlay != null) {
+            _hideOverlay?.call();
+          } else if (await _wv.canGoBack()) {
+            await _wv.goBack();
+          }
+        }
       },
       child: Scaffold(
         backgroundColor: Colors.black,
