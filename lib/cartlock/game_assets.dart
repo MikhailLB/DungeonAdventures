@@ -43,7 +43,7 @@ class GameAssets {
       return;
     }
 
-    logo = await _load('assets/assets/logo.webp');
+    logo = await _load('assets/assets/logo.png');
 
     cartAmber = await _load('assets/assets/cart_1.webp');
     cartAzure = await _load('assets/assets/cart_2.webp');
