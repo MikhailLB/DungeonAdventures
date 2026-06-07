@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:video_player/video_player.dart';
 
 import '../infra/cold_tap_reader.dart';
 import '../infra/dungeon_vault.dart';
@@ -46,12 +45,13 @@ class VaultSplash extends StatefulWidget {
   State<VaultSplash> createState() => _VaultSplashState();
 }
 
-class _VaultSplashState extends State<VaultSplash> {
-  VideoPlayerController? _vid;
-  bool _videoReady = false;
-  _LoadStep _loadStep = _LoadStep.empty;
+class _VaultSplashState extends State<VaultSplash>
+    with SingleTickerProviderStateMixin {
   bool _routed = false;
-  Orientation? _lastOrientation;
+
+  late final AnimationController _dotController;
+  late final AnimationController _barController;
+  double _barProgress = 0.0;
 
   @override
   void initState() {
@@ -62,40 +62,38 @@ class _VaultSplashState extends State<VaultSplash> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    _dotController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..repeat();
+    _barController = AnimationController(vsync: this)
+      ..addListener(() {
+        if (mounted) setState(() => _barProgress = _barController.value);
+      });
     _launch();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final o = MediaQuery.of(context).orientation;
-    if (o != _lastOrientation) {
-      _lastOrientation = o;
-      _swapVideo(o);
-    }
-  }
-
-  Future<void> _swapVideo(Orientation o) async {
-    final asset = o == Orientation.landscape
-        ? 'assets/loading/splash_landscape.mp4'
-        : 'assets/loading/splash_portrait.mp4';
-    final old = _vid;
-    final ctrl = VideoPlayerController.asset(asset);
-    try {
-      await ctrl.initialize();
-      ctrl.setLooping(true);
-      ctrl.setVolume(0);
-      ctrl.play();
-      if (!mounted) { ctrl.dispose(); return; }
-      setState(() { _vid = ctrl; _videoReady = true; });
-      old?.dispose();
-    } catch (_) {
-      ctrl.dispose();
-    }
+  void dispose() {
+    widget.relay.onTokenRefresh = null;
+    _dotController.dispose();
+    _barController.dispose();
+    super.dispose();
   }
 
   void _setStep(_LoadStep s) {
-    if (mounted) setState(() => _loadStep = s);
+    if (!mounted) return;
+    setState(() {});
+    final target = switch (s) {
+      _LoadStep.empty  => 0.05,
+      _LoadStep.midway => 0.55,
+      _LoadStep.done   => 1.0,
+    };
+    _barController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOut,
+    );
   }
 
   Future<void> _launch() async {
@@ -138,12 +136,6 @@ class _VaultSplashState extends State<VaultSplash> {
     }
   }
 
-  @override
-  void dispose() {
-    widget.relay.onTokenRefresh = null;
-    _vid?.dispose();
-    super.dispose();
-  }
 
   Future<void> _backgroundDispatch() async {
     try {
@@ -350,70 +342,149 @@ class _VaultSplashState extends State<VaultSplash> {
     ));
   }
 
-  String _barAsset() {
-    switch (_loadStep) {
-      case _LoadStep.empty:
-        return 'assets/loading/bar_0.webp';
-      case _LoadStep.midway:
-        return 'assets/loading/bar_2.webp';
-      case _LoadStep.done:
-        return 'assets/loading/bar_3.webp';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final barAsset = _barAsset();
     final mq = MediaQuery.of(context);
     final landscape = mq.orientation == Orientation.landscape;
+    final bgAsset = landscape
+        ? 'assets/loading/splash_landscape.png'
+        : 'assets/loading/splash_portrait.png';
     final barW = landscape
-        ? (mq.size.height * 0.35).clamp(0.0, 160.0)
-        : (mq.size.width * 0.70).clamp(0.0, 340.0);
+        ? (mq.size.width * 0.55).clamp(240.0, 500.0)
+        : (mq.size.width * 0.70).clamp(200.0, 420.0);
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const ColoredBox(color: Colors.black),
-          AnimatedOpacity(
-            opacity: _videoReady ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 400),
-            child: _vid != null && _videoReady
-                ? SizedBox.expand(
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: SizedBox(
-                        width: _vid!.value.size.width,
-                        height: _vid!.value.size.height,
-                        child: VideoPlayer(_vid!),
+          Image.asset(bgAsset, fit: BoxFit.cover),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.45, 0.75, 1.0],
+                colors: [Colors.transparent, Color(0xAA000000), Color(0xDD000000)],
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  landscape ? 40 : 28, 0,
+                  landscape ? 40 : 28,
+                  landscape ? 18 : 28,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: barW,
+                      height: 22,
+                      child: CustomPaint(
+                        painter: _VaultBarPainter(progress: _barProgress),
                       ),
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-          if (_videoReady)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: landscape ? 0 : mq.padding.bottom,
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Image.asset(
-                    barAsset,
-                    key: ValueKey(barAsset),
-                    width: barW,
-                    fit: BoxFit.contain,
-                    gaplessPlayback: true,
-                    errorBuilder: (ctx, e, st) =>
-                        const SizedBox(height: 32),
-                  ),
+                    const SizedBox(height: 10),
+                    AnimatedBuilder(
+                      animation: _dotController,
+                      builder: (context, child) {
+                        final dots = '.' *
+                            (1 + (_dotController.value * 3).floor() % 3);
+                        return Text(
+                          'Loading$dots',
+                          style: const TextStyle(
+                            color: Color(0xFFFFE082),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                            shadows: [Shadow(color: Colors.black87, blurRadius: 6)],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
+          ),
         ],
       ),
     );
   }
+}
+
+class _VaultBarPainter extends CustomPainter {
+  const _VaultBarPainter({required this.progress});
+
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = size.height / 2;
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(r));
+
+    canvas.drawRRect(rrect, Paint()..color = const Color(0xFF1A1200));
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = const Color(0xFF8B6914),
+    );
+
+    final fillW = (size.width * progress).clamp(0.0, size.width);
+    if (fillW > 0) {
+      final fillRect = Rect.fromLTWH(0, 0, fillW, size.height);
+      final fillRRect = RRect.fromRectAndRadius(fillRect, Radius.circular(r));
+      canvas.save();
+      canvas.clipRRect(rrect);
+      canvas.drawRRect(
+        fillRRect,
+        Paint()
+          ..shader = const LinearGradient(
+            colors: [Color(0xFFFFD740), Color(0xFFFF8F00)],
+          ).createShader(fillRect),
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, fillW, size.height * 0.45),
+          Radius.circular(r),
+        ),
+        Paint()..color = Colors.white.withValues(alpha: 0.18),
+      );
+      if (progress > 0.02 && progress < 0.99) {
+        final sparkX = fillW - 4;
+        canvas.drawRect(
+          Rect.fromLTWH(sparkX, 0, 4, size.height),
+          Paint()
+            ..shader = LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0),
+                Colors.white.withValues(alpha: 0.55),
+                Colors.white.withValues(alpha: 0),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ).createShader(Rect.fromLTWH(sparkX, 0, 4, size.height)),
+        );
+      }
+      canvas.restore();
+    }
+
+    final tickPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.18)
+      ..strokeWidth = 1.5;
+    for (int i = 1; i < 4; i++) {
+      final x = size.width * i / 4;
+      canvas.drawLine(Offset(x, size.height * 0.2), Offset(x, size.height * 0.8), tickPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _VaultBarPainter old) => old.progress != progress;
 }

@@ -17,8 +17,7 @@ dependencies:
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2
 
-  # ── Loading splash video ──────────────────────────────────
-  video_player: ^2.11.1
+  # video_player removed — splash is now static PNG + Flutter-drawn bar
 
   # ── Gray hub layer ────────────────────────────────────────
   # Version numbers are intentionally bumped from the sibling project
