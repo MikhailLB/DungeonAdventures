@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'bootstrap/loading_screen.dart';
 import 'cartlock/game_assets.dart';
 import 'cartlock/progress_store.dart';
 import 'hub/infra/dungeon_vault.dart';
@@ -114,7 +115,7 @@ class _GatedBootstrap extends StatelessWidget {
   }
 }
 
-// ── White bootstrap: loads assets then goes to MenuScreen ────────────────────
+// ── White bootstrap: shows LoadingScreen while loading assets, then MenuScreen ─
 class _WhiteBootstrap extends StatefulWidget {
   const _WhiteBootstrap();
 
@@ -126,30 +127,39 @@ class _WhiteBootstrapState extends State<_WhiteBootstrap> {
   final GameAssets _assets = GameAssets();
   ProgressStore? _store;
 
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
+  Future<void> _runBootstrap(ValueChanged<int> onStageChanged) async {
 
-  Future<void> _init() async {
+    onStageChanged(0);
     await SystemChrome.setPreferredOrientations(
         const [DeviceOrientation.portraitUp]);
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+
+    onStageChanged(1);
     await _assets.loadAll();
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+
+    onStageChanged(2);
     final store = await ProgressStore.create();
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+
+    onStageChanged(3);
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+
     if (!mounted) return;
     setState(() => _store = store);
+  }
+
+  Future<void> _onLoadingComplete() async {
+    // Navigation happens automatically in build() once _store is set.
   }
 
   @override
   Widget build(BuildContext context) {
     final store = _store;
     if (store == null) {
-      return const Scaffold(
-        backgroundColor: Dungeon.bg,
-        body: Center(
-          child: CircularProgressIndicator(color: Dungeon.gold),
-        ),
+      return LoadingScreen(
+        runBootstrap: _runBootstrap,
+        onComplete: _onLoadingComplete,
       );
     }
     return MenuScreen(assets: _assets, store: store);

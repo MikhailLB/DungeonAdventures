@@ -9,7 +9,7 @@ abstract final class DungeonHubConfig {
   static const String iosStoreId = '6770978783';
 
   // ── Bundle / package ID ───────────────────────────────────
-  static const String bundleId = 'com.dungeon.streetsurvive';
+  static const String bundleId = 'com.farmyard.chickenwaygo';
 
   // ── Display name used in debug logs ──────────────────────
   static const String appTitle = 'Chicken Way Go';

@@ -15,7 +15,7 @@ val hasKeystore = keystorePropertiesFile.exists().also { exists ->
 }
 
 android {
-    namespace = "com.dungeon.streetsurvive"
+    namespace = "com.farmyard.chickenwaygo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -30,7 +30,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.dungeon.streetsurvive"
+        applicationId = "com.farmyard.chickenwaygo"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

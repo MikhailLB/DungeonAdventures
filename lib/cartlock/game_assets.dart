@@ -13,7 +13,6 @@ class GameAssets {
 
   bool loaded = false;
 
-  late ui.Image title;
   late ui.Image logo;
 
   // Carts by color.
@@ -44,7 +43,6 @@ class GameAssets {
       return;
     }
 
-    title = await _load('assets/title.webp');
     logo = await _load('assets/assets/logo.webp');
 
     cartAmber = await _load('assets/assets/cart_1.webp');

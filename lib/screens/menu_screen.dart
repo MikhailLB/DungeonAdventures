@@ -148,9 +148,24 @@ class _MenuScreenState extends State<MenuScreen>
                         ],
                       ),
                       const Spacer(flex: 2),
-                      Image.asset('assets/title.webp', width: 290),
+                      const Text(
+                        'Chicken Way Go',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                          shadows: [
+                            Shadow(
+                                color: Colors.black,
+                                blurRadius: 12,
+                                offset: Offset(0, 3)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Container(
-                        margin: const EdgeInsets.only(top: 6),
+                        margin: const EdgeInsets.only(top: 2),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 4),
                         decoration: BoxDecoration(

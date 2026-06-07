@@ -60,7 +60,6 @@ flutter:
 
   uses-material-design: true
   assets:
-    - assets/title.webp
     - assets/assets/
     - assets/loading/
     - assets/Notifications/
