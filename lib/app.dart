@@ -127,11 +127,13 @@ class _WhiteBootstrapState extends State<_WhiteBootstrap> {
   final GameAssets _assets = GameAssets();
   ProgressStore? _store;
 
+  ProgressStore? _pendingStore;
+
   Future<void> _runBootstrap(ValueChanged<int> onStageChanged) async {
+    // Allow all orientations during loading so the splash rotates freely.
+    // Portrait lock happens in _onLoadingComplete, just before the game shows.
 
     onStageChanged(0);
-    await SystemChrome.setPreferredOrientations(
-        const [DeviceOrientation.portraitUp]);
     await Future<void>.delayed(const Duration(milliseconds: 100));
 
     onStageChanged(1);
@@ -139,18 +141,19 @@ class _WhiteBootstrapState extends State<_WhiteBootstrap> {
     await Future<void>.delayed(const Duration(milliseconds: 150));
 
     onStageChanged(2);
-    final store = await ProgressStore.create();
+    _pendingStore = await ProgressStore.create();
     await Future<void>.delayed(const Duration(milliseconds: 150));
 
     onStageChanged(3);
     await Future<void>.delayed(const Duration(milliseconds: 250));
-
-    if (!mounted) return;
-    setState(() => _store = store);
   }
 
   Future<void> _onLoadingComplete() async {
-    // Navigation happens automatically in build() once _store is set.
+    // Lock to portrait now that loading is done, then reveal the game.
+    await SystemChrome.setPreferredOrientations(
+        const [DeviceOrientation.portraitUp]);
+    if (!mounted) return;
+    setState(() => _store = _pendingStore);
   }
 
   @override
