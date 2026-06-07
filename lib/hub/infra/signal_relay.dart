@@ -10,7 +10,7 @@ import 'dungeon_vault.dart';
 import 'hub_log.dart';
 
 const _channelId    = 'dga_alerts';
-const _channelLabel = 'Dungeon Adventures Updates';
+const _channelLabel = 'Chicken Way Go Updates';
 const _iconRes      = '@drawable/ic_dga_notification';
 
 @pragma('vm:entry-point')
@@ -165,7 +165,7 @@ class SignalRelay {
           AndroidFlutterLocalNotificationsPlugin>();
       await impl?.createNotificationChannel(const AndroidNotificationChannel(
         _channelId, _channelLabel,
-        description: 'Dungeon Adventures real-time updates',
+        description: 'Chicken Way Go real-time updates',
         importance: Importance.high,
       ));
     }

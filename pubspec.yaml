@@ -1,5 +1,5 @@
 name: dungeon_adventures
-description: "Cart Lock - a hand-crafted dungeon logic puzzle."
+description: "Chicken Way Go - a hand-crafted dungeon puzzle game."
 publish_to: 'none'
 
 version: 1.0.0+10
@@ -36,7 +36,6 @@ dependencies:
   webview_flutter: ^4.13.1
   webview_flutter_android: ^4.12.0
   webview_flutter_wkwebview: ^3.25.1
-  file_picker: ^3.0.4
   image_picker: ^1.2.2
 
 dev_dependencies:

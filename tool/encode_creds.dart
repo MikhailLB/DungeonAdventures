@@ -52,10 +52,10 @@ String unmask(List<int> raw) {
 String fmt(List<int> v) => '[${v.join(', ')}]';
 
 void main() {
-  const configHost  = 'https://dungeonadventtures.com';
+  const configHost  = 'https://chiickenwaygo.com';
   const configPath  = '/config.php';
-  const privacyUrl  = 'https://dungeonadventtures.com/privacy-policy.html';
-  const supportUrl  = 'https://dungeonadventtures.com/support.html';
+  const privacyUrl  = 'https://chiickenwaygo.com/privacy-policy.html';
+  const supportUrl  = 'https://chiickenwaygo.com/support.html';
   const gcdHost     = 'https://gcdsdk.appsflyer.com/install_data/v4.0/';
   const afKey       = 'HALyK8KJBwMG7oJNhnsKUH';
   const firebaseNum = '188313373870';

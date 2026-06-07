@@ -283,10 +283,10 @@ class _MenuScreenState extends State<MenuScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _link('Privacy Policy',
-            'https://dungeonadventtures.com/privacy-policy.html'),
+            'https://chiickenwaygo.com/privacy-policy.html'),
         const Text('  ·  ',
             style: TextStyle(color: Dungeon.textDim, fontSize: 12)),
-        _link('Support', 'https://dungeonadventtures.com/support.html'),
+        _link('Support', 'https://chiickenwaygo.com/support.html'),
       ],
     );
   }

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Dungeon Adventures</string>
+	<string>Chicken Way Go</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>dungeon_adventures</string>
+	<string>chicken_way_go</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -43,9 +43,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Dungeon Adventures lets you take a photo to set a custom keeper portrait for your profile.</string>
+	<string>Chicken Way Go lets you take a photo to set a custom keeper portrait for your profile.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Dungeon Adventures lets you pick a photo from your library to use as your custom keeper portrait.</string>
+	<string>Chicken Way Go lets you pick a photo from your library to use as your custom keeper portrait.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use this identifier to personalise in-game events and tailor reward content to your puzzle play style.</string>
 	<key>UIApplicationSceneManifest</key>

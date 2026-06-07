@@ -12,7 +12,7 @@ abstract final class DungeonHubConfig {
   static const String bundleId = 'com.dungeon.streetsurvive';
 
   // ── Display name used in debug logs ──────────────────────
-  static const String appTitle = 'Dungeon Adventures';
+  static const String appTitle = 'Chicken Way Go';
 
   // ── Timing constants ─────────────────────────────────────
   /// Seconds before push opt-in re-appears after Skip.

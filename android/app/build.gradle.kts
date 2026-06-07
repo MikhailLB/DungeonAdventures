@@ -4,7 +4,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
+    // google-services applied only in gray-part branch (requires google-services.json)
+    // id("com.google.gms.google-services")
 }
 
 val keystoreProperties = Properties()
@@ -30,7 +31,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dungeon.streetsurvive"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

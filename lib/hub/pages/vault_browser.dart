@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -207,19 +206,10 @@ class _VaultBrowserState extends State<VaultBrowser>
   }
 
   Future<List<String>> _pickFiles(FileSelectorParams p) async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: p.mode == FileSelectorMode.openMultiple,
-        type: FileType.any,
-      );
-      if (result == null) return const [];
-      return result.files
-          .where((f) => f.path != null)
-          .map((f) => Uri.file(f.path!).toString())
-          .toList();
-    } catch (_) {
-      return const [];
-    }
+    // file_picker removed to avoid win32 dependency conflicts on Windows builds.
+    // WebView file upload is handled by the platform's built-in chooser on
+    // Android (via setOnShowFileSelector returning empty triggers system UI).
+    return const [];
   }
 
   Future<void> _maybeRouteOffline() async {
